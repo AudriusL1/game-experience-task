@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\DailyFeedbackInfoNotificationJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -12,7 +13,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        //TODO: uncomment the following lines to enable the job when it is implemented
+//        $schedule->job(new DailyFeedbackInfoNotificationJob())->dailyAt('05:00');
     }
 
     /**
@@ -20,7 +22,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
