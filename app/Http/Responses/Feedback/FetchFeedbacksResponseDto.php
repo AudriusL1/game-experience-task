@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Responses;
+namespace App\Http\Responses\Feedback;
 
 use App\Enums\FeedbackCategoryEnum;
 use App\Enums\FeedbackStateEnum;
 use App\Enums\PlatformEnum;
-use App\Http\Requests\Rules\ValidationRules;
 use App\Models\Feedback;
 use Spatie\LaravelData\Data;
 
 
-class FeedbackResponseDto extends Data
+class FetchFeedbacksResponseDto extends Data
 {
     public function __construct(
+        public string               $id,
         public string               $created_at,
         public string               $game_name,
         public FeedbackStateEnum    $feedback_state,
@@ -28,6 +28,7 @@ class FeedbackResponseDto extends Data
     public static function fromModel(Feedback $model): self
     {
         return new self(
+            id: $model->getKey(),
             created_at: $model->created_at,
             game_name: $model->game->name,
             feedback_state: $model->state,
@@ -37,4 +38,6 @@ class FeedbackResponseDto extends Data
             content: $model->content,
         );
     }
+
+
 }

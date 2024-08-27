@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\FeedbackController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['token.auth', 'throttle:1,1'])->group(function () {
+    Route::post('/feedback', [FeedbackController::class, 'store']);
 });
-
-Route::post('/feedback', [FeedbackController::class, 'store']);
-Route::get('/fetch', [FeedbackController::class, 'fetch']);
+Route::get('/fetch', [FeedbackController::class, 'fetchFeedbacks']);
+Route::get('/feedbacks/{feedback}', [FeedbackController::class, 'fetchSingleFeedback']);
+Route::put('/feedbacks/{feedback}/update', [FeedbackController::class, 'updateFeedbackStatus']);

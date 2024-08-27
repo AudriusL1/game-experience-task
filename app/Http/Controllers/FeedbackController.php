@@ -2,24 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreFeedbackRequestDto;
-use App\Http\Responses\FetchFeedbacksResponseDto;
+use App\Http\Requests\Feedback\FetchFeedbacksRequestDto;
+use App\Http\Requests\Feedback\StoreFeedbackRequestDto;
+use App\Http\Requests\Feedback\UpdateFeedbackStateDto;
+use App\Http\Responses\Feedback\FetchFeedbacksResponseDto;
 use App\Models\Feedback;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Spatie\LaravelData\PaginatedDataCollection;
 
 class FeedbackController extends Controller
 {
     public function store(StoreFeedbackRequestDto $request): JsonResponse
     {
-        Feedback::query()->create($request->toArray());
+        try {
+            Feedback::query()->create($request->toArray());
 
-        return response()->json(['message' => 'Feedback stored successfully']);
+            return response()->json(['message' => 'Feedback stored successfully'], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to store feedback'], 500);
+        }
     }
 
-    public function fetch(): PaginatedDataCollection
+    public function fetchFeedbacks(FetchFeedbacksRequestDto $request): PaginatedDataCollection
     {
-        return FetchFeedbacksResponseDto::collect(Feedback::query()->paginate(10), PaginatedDataCollection::class);
+        return FetchFeedbacksResponseDto::collect(
+            Feedback::query()
+                ->whereCategory($request->category)
+                ->wherePlatform($request->platform)
+                ->whereState($request->state)
+                ->paginate(10),
+            PaginatedDataCollection::class
+        );
+    }
+
+    public function fetchSingleFeedback(Feedback $feedback): FetchFeedbacksResponseDto|JsonResponse
+    {
+        if (!$feedback->exists) {
+            return response()->json(['error' => 'Feedback not found'], 404);
+        }
+
+        return FetchFeedbacksResponseDto::fromModel($feedback);
+    }
+
+    public function updateFeedbackStatus(Feedback $feedback, UpdateFeedbackStateDto $request): FetchFeedbacksResponseDto|JsonResponse
+    {
+        if (!$feedback->exists) {
+            return response()->json(['error' => 'Feedback not found'], 404);
+        }
+
+        $feedback->update(['state' => $request->status]);
+
+        return FetchFeedbacksResponseDto::fromModel($feedback);
     }
 }
