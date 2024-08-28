@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['token.auth', 'throttle:1,1'])->group(function () {
     Route::post('/feedback', [FeedbackController::class, 'store']);
 });
-Route::get('/fetch', [FeedbackController::class, 'fetchFeedbacks']);
-Route::get('/feedbacks/{feedback}', [FeedbackController::class, 'fetchSingleFeedback']);
-Route::put('/feedbacks/{feedback}/update', [FeedbackController::class, 'updateFeedbackStatus']);
+
+Route::prefix('feedbacks')->group(function () {
+    Route::get('/', [FeedbackController::class, 'fetchFeedbacks']);
+    Route::get('/{feedback}', [FeedbackController::class, 'fetchSingleFeedback']);
+    Route::put('/{feedback}/update', [FeedbackController::class, 'updateFeedbackStatus']);
+});
+
