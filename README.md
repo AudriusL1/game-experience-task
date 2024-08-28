@@ -41,8 +41,3 @@
    ```bash
    exit
    ```
-
-6. **Exit the Sail shell**
-   ```bash
-   exit
-   ```
